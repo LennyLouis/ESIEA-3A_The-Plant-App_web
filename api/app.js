@@ -4,7 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
-var axios = require('axios');
+var mqtt = require('mqtt');
+
+const PORT = 9000;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -27,6 +29,39 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use("/mqttCommunication", mqttCommunicationRouter)
 
+var http = require('http').createServer(app);
+const io = require("socket.io")(http, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
+io.on('connection', socket => {
+  console.log('a user connected');
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+const url = 'ws://lennylouis.fr:1883';
+const options = {
+    clean: true,
+    connectionTimeout: 4000,
+    username: 'web-backend',
+    password: '1daYsb8pkTBTvnJSo61T'
+};
+
+const client = mqtt.connect(url, options);
+
+client.on('message', (topic, msg) => {
+  console.log('Message :', topic, msg.toString());
+  io.emit('data', JSON.parse(msg));
+});
+
+client.subscribe('test');
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -41,6 +76,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+http.listen(3001, () => {
+  console.log('listening on *:3001');
 });
 
 module.exports = app;

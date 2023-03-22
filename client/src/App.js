@@ -1,23 +1,34 @@
 import React, { Component } from 'react';
 import plant from './trace.svg';
 import './App.css';
-
+import { io } from 'socket.io-client';
 
 class App extends Component {
   constructor(props){
     super(props);
-    this.state = { apiResponse: ""};
+    this.state = {
+      temperature: "",
+      humidity: "",
+      dirtHumidity: "",
+      lastWatering: ""
+    };
   }
 
-  callAPI(){
-    fetch('http://localhost:9000/mqttCommunication')
-    .then(res => res.text())
-    .then(res => this.setState({apiResponse: res}))
-    .catch(err => err);
+  updateStatistics(data){
+    this.setState({
+      temperature: data.temperature,
+      humidity: data.humidity,
+      dirtHumidity: data.dirtHumidity,
+      lastWatering: data.lastWatering
+    });
   }
 
   componentDidMount() {
-    this.callAPI();
+    console.log('YES');
+    const socket = io.connect('ws://127.0.0.1:3001');
+    socket.on('data', data => {
+      this.updateStatistics(data);
+    });
   }
 
   render() {
@@ -31,10 +42,10 @@ class App extends Component {
         <div className="Container">
           <img src={plant}></img>
           <div className="Statistics">
-            <div className="Temperature">20.2°C</div>
-            <div className="Humidity">22%</div>
-            <div className="DirtHumidity">80%</div>
-            <div className="LastWatering">{ this.state.apiResponse }</div>
+            <div className="Temperature">{ this.state.temperature }</div>
+            <div className="Humidity">{ this.state.humidity }</div>
+            <div className="DirtHumidity">{ this.state.dirtHumidity }</div>
+            <div className="LastWatering">{ this.state.lastWatering }</div>
           </div>
           <div className="Watering">
             <span>
