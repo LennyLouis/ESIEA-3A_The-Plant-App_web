@@ -37,14 +37,6 @@ const io = require("socket.io")(http, {
   }
 });
 
-io.on('connection', socket => {
-  console.log('a user connected');
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
-
 const url = 'ws://lennylouis.fr:1883';
 const options = {
     clean: true,
@@ -54,6 +46,18 @@ const options = {
 };
 
 const client = mqtt.connect(url, options);
+
+io.on('connection', socket => {
+  console.log('a user connected');
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+
+  socket.on('watering', (msg) => {
+    client.publish('watering', msg);
+  });
+});
 
 client.on('message', (topic, msg) => {
   console.log('Message :', topic, msg.toString());

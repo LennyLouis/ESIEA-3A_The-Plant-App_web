@@ -16,6 +16,7 @@ html body {
   padding: 0.6em;
   background-color: white;
   border-radius: 12px;
+  color: #95CB9A;
 }
 
 .Container {
@@ -41,14 +42,22 @@ html body {
   margin-top: 2em;
 }
 
-.Watering span{
+.Watering button{
   background-color: #95CB9A;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 8px;
+  padding-bottom: 8px;
   border-radius: 12px;
+  border: none;
   color: white;
+}
+
+.Watering button:hover {
+  background-color: white;
+  border: 1px solid #95CB9A;
+  color: #95CB9A;
+  cursor: pointer;
 }
 
 .Statistics {
