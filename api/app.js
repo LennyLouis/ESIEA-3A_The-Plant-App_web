@@ -37,34 +37,33 @@ const io = require("socket.io")(http, {
   }
 });
 
-const url = 'ws://lennylouis.fr:1883';
+const url = 'ws://lennylouis.fr:9001';
 const options = {
     clean: true,
     connectionTimeout: 4000,
-    username: 'web-backend',
-    password: '1daYsb8pkTBTvnJSo61T'
+    username: '1sihuvY7E9zKSY3CYINh',
+    password: 'n0sks6LwqTUchlQUdoIfrKNdPSoRRrUC4r60w7rDc'
 };
 
 const client = mqtt.connect(url, options);
 
 io.on('connection', socket => {
-  console.log('a user connected');
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-
-  socket.on('watering', (msg) => {
-    client.publish('watering', msg);
-  });
 });
 
 client.on('message', (topic, msg) => {
-  console.log('Message :', topic, msg.toString());
-  io.emit('data', JSON.parse(msg));
+  try{
+    var message = "" + msg;
+    io.emit('data', JSON.parse(message.replaceAll("�", "")));
+  } catch(error){
+    console.error(error);
+  }
 });
 
-client.subscribe('test');
+client.on('connect', () => {
+  console.log("Connected");
+});
+
+client.subscribe('plant');
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
